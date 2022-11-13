@@ -1,0 +1,226 @@
+<!doctype html>
+<head>
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!--Import materialize.css-->
+  <link type="text/css" rel="stylesheet" href="/static/css/materialize.min.css"  media="screen,projection"/>
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Итоговый проект по курсу DataScience</title>
+</head>
+<body>
+<header>
+  <!--nav class="top-nav"-->
+        <div class="container">
+          <div class="nav-wrapper">
+            <div class="row">
+              <div class="col s12 m10 offset-m1">
+                <h1 class="header indigo-text">Итоговое задание</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      <!--/nav-->
+</header>
+<main>
+  <div class="container">
+    <div class="row">
+      <div class="col s12 m10 offset-m1 xl7 offset-xl1">
+        <div id="right" class="section scrollspy">
+           <nav>
+              <div class="nav-wrapper">
+                <!--a href="#" class="brand-logo">Прогноз параметров сварного шва</a-->
+                <ul id="nav-mobile" class="right hide-on-med-and-down">
+                  <li><a href="/?mode=predict">Прогноз</a></li>
+                  <li><a href="/?mode=task">Постановка задачи</a></li>
+                  <li><a href="/?mode=solution">Описание решения</a></li>
+                  <li><a href="/?mode=about">О проекте</a></li>
+                </ul>
+              </div>
+            </nav>
+          {% if mode == 'predict' %}
+            <h3 class="header indigo-text">Прогноз ширины и глубины сварного шва</h3>
+            {% if prediction_result %}
+            {% if prediction_result['warn_value_error'] %}
+                <blockquote>
+                    Неверно введено значение {{ prediction_result['warn_value_error'] }} -  ошибка при конвертации во float
+                </blockquote>
+            {% else %}
+            <div class="divider"></div>
+            <h5 class="header indigo-text">Результат прогноза</h5>
+                {% if not prediction_result['vir_IW'] %}
+                <blockquote>
+                    Введенное значение величины сварочного тока (IW) выходит за диапазон значений,
+                    для которого строилась модель. Результат прогноза может быть некорректен.
+                </blockquote>
+                {% endif %}
+                {% if not prediction_result['vir_IF'] %}
+                <blockquote>
+                    Введенное значение тока фокусировки электронного пучка (IF) выходит за диапазон значений,
+                    для которого строилась модель. Результат прогноза может быть некорректен.
+                </blockquote>
+                {% endif %}
+                {% if not prediction_result['vir_VW'] %}
+                <blockquote>
+                    Введенное значение скорости сварки (VW) выходит за диапазон значений,
+                    для которого строилась модель. Результат прогноза может быть некорректен.
+                </blockquote>
+                {% endif %}
+                {% if not prediction_result['vir_FP'] %}
+                <blockquote>
+                    Введенное значение расстояния от поверхности образцов до электронно-оптической системы (FP)
+                    выходит за диапазон значений,
+                    для которого строилась модель. Результат прогноза может быть некорректен.
+                </blockquote>
+                {% endif %}
+                <p>Прогнозная глубина сварного шва (Depth) -  {{ prediction_result['Depth'] }}</p>
+                <p>Прогнозная ширина сварного шва (Width) -  {{ prediction_result['Width'] }}</p>
+                <p>
+                    Введеные данные. IW - {{ prediction_result['IW'] }} ,
+                    IF - {{ prediction_result['IF'] }},
+                    VW - {{ prediction_result['VW'] }},
+                    FP - {{ prediction_result['FP'] }}.
+                    Использованная модель -
+                    {% if prediction_result['model'] == 'LinearRegression' %}
+                        линейная регрессия
+                    {% elif prediction_result['model'] == 'MLPRegression' %}
+                        искуственная нейронная сеть
+                    {% else %}
+                        <blockquote>
+                            неожиданные исходные данные (ошибка ввода?) model = {{ prediction_result['model'] }}
+                        </blockquote>
+                    {% endif %}
+                </p>
+            {% endif %}
+            {% endif %}
+            <div class="divider"></div>
+            <h5 class="header indigo-text">Укажите данные для прогноза</h5>
+            <form method="POST" action="/?mode == 'predict'">
+                <p>
+                <h5>Метод прогноза:</h5>
+                <p>
+            </p>
+                    <p>
+                    <label>
+                         <input type="radio" name="model" value="LinearRegression" checked/>
+                            <span>Линейная регрессия</span>
+                    </label>
+                    </p>
+                    <label>
+                         <input type="radio" name="model" value="MLPRegression"/>
+                        <span>Нейронная сеть</span>
+                    </label>
+                </p>
+                <table>
+                    <thead>
+                      <th>Параметр</th>
+                      <th>Исследованный диапазон</th>
+                      <th>Значение</th>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Величина сварочного тока (IW)</td>
+                        <td>{{ range_limits['IW'][0] }} - {{ range_limits['IW'][1] }}</td>
+                        <td><input name="IW" value="{{ range_limits['IW'][0] + (range_limits['IW'][1] - range_limits['IW'][0])/2 }}"/></td>
+                      </tr>
+                      <tr>
+                        <td>Ток фокусировки электронного пучка (IF)</td>
+                        <td>{{ range_limits['IF'][0] }} - {{ range_limits['IF'][1] }}</td>
+                        <td><input name="IF" value="{{ range_limits['IF'][0] + (range_limits['IF'][1] - range_limits['IF'][0])/2 }}"/></td>
+                      </tr>
+                      <tr>
+                        <td>Скорость сварки (VW)</td>
+                        <td>{{ range_limits['VW'][0] }} - {{ range_limits['VW'][1] }}</td>
+                        <td><input name="VW" value="{{ range_limits['VW'][0] + (range_limits['VW'][1] - range_limits['VW'][0])/2 }}"/></td>
+                      </tr>
+                      <tr>
+                        <td>Расстояние от поверхности образцов до электронно-оптической системы (FP)</td>
+                        <td>{{ range_limits['FP'][0] }} - {{ range_limits['FP'][1] }}</td>
+                        <td><input name="FP" value="{{ range_limits['FP'][0] + (range_limits['FP'][1] - range_limits['FP'][0])/2 }}"/></td>
+                      </tr>
+                        <tr><td colspan="3" class="right-align">
+                            <button class="btn waves-effect waves-light" type="submit" name="action">Прогноз<i class="material-icons right">send</i>
+  </button></td></tr>
+                    </tbody>
+                  </table>
+            </form>
+          {% elif mode == 'task' %}
+                <h3 class="header indigo-text">Постановка задачи</h3>
+                <h5 class="header">Прогнозирование размеров сварного шва при электронно-лучевой сварке
+                  тонкостенных конструкций аэрокосмического назначения</h5>
+                <p>
+                     В качестве исходных данных были взяты результаты экспериментальных исследований, проводимых в целях улучшения технологического процесса электронно-лучевой сварки изделия,
+                      сборка которого состоит из элементов, состоящих из разнородного материала.
+
+                </p>
+                <p>
+                  Установка электронно-лучевой сварки, на которой проводились исследования, предназначена для сварки
+                  электронным лучом в глубоком вакууме деталей сборочных единиц из нержавеющих сталей, титановых,
+                  алюминиевых и специальных сплавов.
+                </p>
+                <p >
+                  Существующая установка электронно-лучевой сварки обеспечивает повторяемость режимов в рамках
+                  возможностей реализованной системы управления.
+                  Работы по сварке выполнялись на образцах-имитаторах, соответствующих технологическому изделию.
+                </p>
+                <p >Для уменьшения вложения энергии при сварке:
+                  <ul class="browser-default">
+                    <li>Снижалась величина сварочного тока (IW);</li>
+                    <li>Увеличивался ток фокусировки электронного пучка (IF);</li>
+                    <li>Увеличивалась скорость сварки (VW);</li>
+                    <li>Менялось расстояние от поверхности образцов до электронно-оптической системы (FP).</li>
+                  </ul>
+                </p>
+
+                <p>
+                  По совокупности параметров технологических режимов обеспечивались минимально
+                  возможные размеры сварных швов: глубина шва (Depth) и ширина шва (Width).
+                </p>
+                <p>В процессе выполнения работ была произведена электронно-лучевая сварка 18-ти единиц образцов.
+                 </p>
+                <p> Результаты металлографического контроля по размерам сварного шва для каждого образца проводились в
+                  4-х поперечных сечениях сварного шва. Ускоряющее напряжение было постоянным в диапазоне 19,8 – 20 кВ.
+                  </p>
+                  <p>Набор полученных данных собраны в составе режимов сварки, размеров сварочных швов в поперечных
+                  сечениях всех образцов.</p>
+                <h5>Требуется</h5>
+                <p class="caption"> Провести прогнозирование глубины (Depth) и ширины (Width) сварного шва в зависимости
+                  от параметров технологического процесса (IW, IF, VW, FP).</p>
+                 <h5>Дополнительные требования</h5>
+                <p>
+                  <ul class="browser-default">
+                    <li>Предварительная обработка датасета</li>
+                    <li>Применение минимум 3-х алгоритмов машинного обучения (включая обязательно использование
+                      искусственных нейронных сетей) в Jupyter Notebook (или colab) позволяющих решить поставленную
+                      задачу анализа данных, выбрать лучшую модель и применить ее в приложении</li>
+                    <li>Создание локального репозитория git</li>
+                    <li>Реализация приложения. Приложение может быть консольное, оконное или веб-приложение по выбору</li>
+                    <li>Создание профиля на github.com</li>
+                    <li>Выгрузка коммитов приложения из локального репозитория на github.com.</li>
+                  </ul>
+                </p>
+              {% elif mode == 'solution' %}
+                <h3 class="header indigo-text">Описание решения</h3>
+                <p>Прогнозирование может осуществляться с использованием модели полиноминальной линейной регрессии 3 порядка
+                  (с использованием библиотеки sklean) и полносвязанной нейронной сети (реализована с использованием keras)</p>
+                <p>
+                  Обоснование выбранных методов решения и подробное описание приводится в
+                  <a href="/static/TaskDescription.pdf">статье</a> или в блокноте
+                  <code class=" language-markup">notebook/eda/TaskDescription.ipyb</code>e (в проекте)
+                </p>
+              {% elif mode == 'about' %}
+                <h3 class="header indigo-text">Информация о проекте</h3>
+                  <div class="grey-darken-1-text">
+                    <p class="caption">Проект выполнен в качестве итогового задания по курсу Аналитик данных (Data scientist) Соловьевым Михаилом</p>
+                      <div class="divider"></div>
+                      <p class="caption">2022 год</p>
+              {%else %}
+                <h3 class="header indigo-text">Режим работы {{ mode }} не подерживается</h3>
+              {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script type="text/javascript" src="/static/js/materialize.min.js"></script>
+</body>

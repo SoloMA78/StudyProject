@@ -43,6 +43,7 @@ if __name__ == '__main__':
             else:
                 print('Использование модели с заданными параметрами дало некорректные результаты')
             if str(input("Следующий прогноз (Y/n)")).lower() == 'n':
+                #print('break')
                 break
     print(arg_set.data_file_path)
     # parser.print_usage()
