@@ -34,6 +34,11 @@ static/TaskDescription.pdf
   - pandas
   - scikit-learn
 
+Для установки необходимых зависимостей можно восполььзоваться командой:
+````
+pip install -r requirements.txt
+````
+
 ### Описание проекта
 Исходный код приложения организован в проект PyCharm. 
 Структура проекта:
@@ -73,10 +78,34 @@ __main.py__ __-method__ _метод расчета_ __-mode__ _режим раб
     -mode - принимает два значения fit и predict, по умолчанию predict. Данные обученных моделей сохранябтся на диске ('lr_model' и 'MLP_model' соответственно) 
     -data_file_path - путь к файлу с данными  для переобучения модели, по умолчанию ./data/raw/ebw_data.csv
 
-### WEB приложение
-Вызов __web приложения__:
-flask --app flask_backend run
+Примеры команд для запуска.
+Выполнение прогноза с использованием модели линейной регрессии:
+```
+python main.py -method LinearRegression -mode predict
+```
+Выполнение прогноза с использованием нейронной сети:
+```
+python main.py -method MLPRegression -mode predict
+```
+Переобучение модели линейной регрессии:
+```
+python main.py -method LinearRegression -mode fit -data_file_path data/raw/ebw_data.csv
+```
+Переобучение нейронной сети:
+```
+python main.py -method MLPRegression -mode fit -data_file_path data/raw/ebw_data.csv
+```
 
+### WEB приложение
+Вызов __web приложения__.
+Из комадной строки:
+```commandline
+flask --app flask_backend run
+```
+Исполнение файла Python:
+```
+python flask_backend.py
+```
 После запуска flask в браузере открыть страницу http://127.0.0.1:5000/
 
 Использование tensorflow из flask иногда может потребовать дополнительных настроек. При вызове ограничивается объем видеопамяти, используемой tensorflow. 

@@ -21,7 +21,9 @@ class LRPredict:
     def __init__(self):
         if Path('lr_model').exists():
             f = open('lr_model', 'rb')
-        self.pipe = pickle.load(f)
+            self.pipe = pickle.load(f)
+        else:
+            print('Невозможно загрузить модель линейной регрессии. Файл lr_model  не найден.')
 
     @staticmethod
     def fit(data_path):

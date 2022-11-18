@@ -39,3 +39,6 @@ def start_page():
         prediction_result['Width'] = f'{width:.2f}'
     return render_template('start.html', mode=mode, range_limits=LRPredict.range_limits,
                            prediction_result=prediction_result)
+
+
+app.run()
