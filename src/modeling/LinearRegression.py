@@ -37,7 +37,7 @@ class LRPredict:
             f = open('lr_model', 'wb')
             f.write(s)
             f.close()
-            print('Успешно сохранена модель полиноминальной линейной регрессии 2 порядка.')
+            print('Успешно сохранена модель полиноминальной линейной регрессии 3 порядка.')
             print('Метрики точности модели:')
             print(f'\t mean_squared_error: {mean_squared_error(y_true=y_test, y_pred=pipe.predict(x_test))}')
             print(f'\t mean_absolute_error: {mean_absolute_error(y_true=y_test, y_pred=pipe.predict(x_test))}')

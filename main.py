@@ -52,7 +52,5 @@ if __name__ == '__main__':
                 print('Введенное значение не может быть конвертировано в тип float')
             if str(input("Следующий прогноз (Y/n)")).lower() == 'n':
                 break
-    print(arg_set.data_file_path)
-    # parser.print_usage()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
